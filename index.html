@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>San Valentin 💘</title>
+
+    <!--
+    ====== CSS / ESTILOS ======
+    - Cambia COLORES en :root (tema blush-champagne).
+    - Cambia look de botones en la sección BUTTONS.
+    - Cambia tamaño de card, imagen, etc. aquí mismo.
+  -->
+    <style>
+      /* =========================================================
+       1) TEMA: blush-champagne (EDITA AQUÍ COLORES/SOMBRAS)
+       ========================================================= */
+      :root {
+        /* ===== LAVENDER DREAM (cute + elegante) ===== */
+        --bg1: #f7f2ff; /* fondo lavanda clarito */
+        --bg2: #e8ddff; /* degradado lavanda */
+        --card: rgba(255, 255, 255, 0.72);
+        --cardBorder: rgba(255, 255, 255, 0.65);
+
+        --text: #201a2b;
+        --muted: rgba(32, 26, 43, 0.72);
+
+        --accent: #7c4dff; /* lila principal */
+        --accent2: #ff73b9; /* toque rosita para el degradado (cute, no extremo) */
+        --accentText: #ffffff;
+
+        --outline: rgba(124, 77, 255, 0.22);
+        --shadow: 0 22px 70px rgba(28, 18, 38, 0.14);
+
+        --radius: 26px;
+        --font:
+          system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue",
+          Arial;
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: var(--font);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at top, var(--bg1), var(--bg2));
+        color: var(--text);
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* Sparkles suaves (opcional) */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: -40px;
+        background:
+          radial-gradient(
+            circle at 20% 20%,
+            rgba(255, 255, 255, 0.55),
+            transparent 35%
+          ),
+          radial-gradient(
+            circle at 80% 30%,
+            rgba(220, 205, 255, 0.55),
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 30% 80%,
+            rgba(255, 210, 240, 0.25),
+            transparent 42%
+          ),
+          radial-gradient(
+            circle at 70% 85%,
+            rgba(220, 205, 255, 0.35),
+            transparent 45%
+          );
+        filter: blur(2px);
+        pointer-events: none;
+      }
+
+      .card {
+        width: min(560px, 92vw);
+        background: var(--card);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--cardBorder);
+        border-radius: var(--radius);
+        padding: 26px 22px;
+        box-shadow: var(--shadow);
+        text-align: center;
+        position: relative;
+        overflow: visible;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: 28px;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+      p {
+        margin: 0 0 16px;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+
+      .headline {
+        margin: 0 0 10px;
+        font-size: 28px;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap; /* por si en móvil se va a 2 líneas */
+      }
+
+      #titleInlineImg {
+        width: 104px; /* ⬅ más grande */
+        height: 104px;
+        border-radius: 14px;
+        object-fit: cover;
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        display: none;
+      }
+
+      .media {
+        display: flex;
+        justify-content: center;
+        margin: 10px 0 16px;
+      }
+      .media img {
+        width: min(340px, 82vw);
+        height: 220px;
+        object-fit: cover;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.16);
+        filter: saturate(1.05) contrast(1.02);
+        display: none; /* se prende cuando haya src */
+      }
+
+      .btns {
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 10px;
+        position: relative;
+        min-height: 76px;
+      }
+
+      /* =========================================================
+       2) BUTTONS (EDITA AQUÍ EL LOOK DE BOTONES)
+       ========================================================= */
+      button {
+        border: 0;
+        cursor: pointer;
+        padding: 14px 22px;
+        border-radius: 999px; /* pill */
+        font-size: 18px;
+        font-weight: 650;
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease,
+          opacity 0.15s ease;
+        user-select: none;
+      }
+      button:hover {
+        transform: translateY(-1px);
+      }
+      button:active {
+        transform: translateY(0px) scale(0.99);
+      }
+
+      #yesBtn {
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        color: var(--accentText);
+        box-shadow: 0 10px 24px rgba(232, 74, 122, 0.28);
+        transform: scale(1); /* inicial */
+      }
+      #noBtn {
+        background: rgba(255, 255, 255, 0.55);
+        color: var(--text);
+        border: 1.5px solid var(--outline);
+        box-shadow: none;
+        position: relative; /* normal */
+        transform: none; /* importante */
+        left: auto;
+        top: auto;
+        right: auto;
+        bottom: auto; /* reseteo */
+      }
+
+      #noBtn.boldYes {
+        font-weight: 800;
+      }
+
+      .hint {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 12px;
+      }
+
+      /* Modal (la cajita de “¿segura?”) */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .modal {
+        width: min(440px, 94vw);
+        background: white;
+        border-radius: 18px;
+        padding: 18px 16px;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+        text-align: center;
+      }
+      .modal h2 {
+        margin: 6px 0 6px;
+        font-size: 22px;
+        letter-spacing: -0.01em;
+      }
+      .modal p {
+        margin: 0 0 14px;
+        color: rgba(0, 0, 0, 0.72);
+      }
+      .modal .actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .ghost {
+        background: #fff;
+        color: var(--text);
+        border: 1.5px solid var(--outline);
+        box-shadow: none;
+      }
+
+      /* Canvas confetti (opcional) */
+      canvas#confetti {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Confetti opcional cuando dice “Sí” -->
+    <canvas id="confetti"></canvas>
+
+    <div class="card" id="card">
+      <!--
+      ====== ÁREA DE IMAGEN ======
+      - Pon tus imágenes en /imgs/... o usa URLs.
+      - Se actualiza con setScene(...)
+    -->
+      <div class="media">
+        <img id="sceneImg" alt="imagen bonita" />
+      </div>
+
+      <!-- Título y descripción cambian por escena -->
+      <h1 class="headline">
+        <span id="titlePrefix"></span>
+        <img id="titleInlineImg" alt="Valentín" />
+        <span id="titleSuffix"></span>
+      </h1>
+
+      <p id="desc"></p>
+
+      <div class="btns" id="btns">
+        <button id="yesBtn"></button>
+        <button id="noBtn"></button>
+      </div>
+
+      <div class="hint" id="hint"></div>
+    </div>
+
+    <!-- Modal: lo usamos para “¿segura?” y similares -->
+    <div class="overlay" id="overlay">
+      <div class="modal">
+        <h2 id="modalTitle"></h2>
+        <p id="modalText"></p>
+        <div class="actions">
+          <button id="modalPrimary"></button>
+          <button class="ghost" id="modalSecondary"></button>
+        </div>
+      </div>
+    </div>
+    <audio id="acceptedAudio" preload="auto">
+      <source src="audio/accepted.mp3" type="audio/mpeg" />
+    </audio>
+
+    <script>
+      /*
+      ==========================================================
+      =============== 1) CONFIGURACIÓN (TÚ EDITAS) ===============
+      ==========================================================
+      ✅ Aquí rellenas textos e imágenes.
+      - scenes: “pantallas”
+      - noPrompts: lista de “¿segura?” cuando presiona No.
+    */
+
+      const scenes = {
+        start: {
+          titlePrefix: "¿Quieres ser mi San",
+          titleInlineImg: "imgs/valentin.jpg",
+          titleSuffix: " ?",
+          desc: "Di que sí, porfavorsito con azucar encima 🥺",
+          img: "imgs/cat.jpg", 
+          yesText: "Sí 💖",
+          noText: "No 🙃",
+          hint: "Solo hay una respuesta correcta.",
+        },
+        accepted: {
+          title: "TODO: Pantalla final (¡SÍ!)",
+          desc: "Preparate para la noche de tu vida, nena 😎",
+          img: "imgs/accepted.gif", // TODO: "imgs/yes.jpg" o ''
+          // en accepted ya no usamos botones de sí/no
+          titlePrefix: "¡SÍ! 💖",
+          titleInlineImg: "",
+          titleSuffix: "",
+        },
+      };
+
+      const noPrompts = [
+        {
+          title: "¿Segura...? 🥺",
+          text: "(Creo que presionaste 'No' por error.)",
+        },
+        { title: "¿Segurísima...? 😳", text: "Piénsalo bien..." },
+        { title: "¿Recontra segura? 🤨", text: "July se va a poner triste" },
+        {
+          title: "Ok… última oportunidad 🙏",
+          text: "Piensa en una noche viendo mis bucles despeinados...",
+        },
+        { title: "Esto ya es personal 😤", text: "Por favor, te pago" },
+      ];
+
+      const NO_GIVES_UP_AFTER = 6; // pon 0 si no quieres rendición
+
+      // ✅ Constantes para el crecimiento del botón Sí (EDITA AQUÍ)
+      const YES_GROW_STEP = 0.08; // elegante: 0.04–0.06
+      const YES_GROW_MAX = 10; // cuántos “No” cuentan para crecer
+
+      /*
+      ==========================================================
+      ============== 2) ESTADO (NO TOCAR MUCHO) =================
+      ==========================================================
+    */
+      let noCount = 0; // cuántas veces presionó “No”
+      let currentScene = "start";
+      let noHasGivenUp = false;
+
+      /*
+      ==========================================================
+      ============ 3) DOM / REFERENCIAS (NO TOCAR) ==============
+      ==========================================================
+    */
+      const el = {
+        card: document.getElementById("card"),
+        titlePrefix: document.getElementById("titlePrefix"),
+        titleInlineImg: document.getElementById("titleInlineImg"),
+        titleSuffix: document.getElementById("titleSuffix"),
+        desc: document.getElementById("desc"),
+        hint: document.getElementById("hint"),
+        img: document.getElementById("sceneImg"),
+        yesBtn: document.getElementById("yesBtn"),
+        noBtn: document.getElementById("noBtn"),
+        btns: document.getElementById("btns"),
+
+        overlay: document.getElementById("overlay"),
+        modalTitle: document.getElementById("modalTitle"),
+        modalText: document.getElementById("modalText"),
+        modalPrimary: document.getElementById("modalPrimary"),
+        modalSecondary: document.getElementById("modalSecondary"),
+
+        confetti: document.getElementById("confetti"),
+        audio: document.getElementById("acceptedAudio"),
+      };
+
+      /*
+      ==========================================================
+      ============== 4) RENDER / CAMBIOS DE UI ==================
+      ==========================================================
+    */
+      function setScene(sceneKey) {
+        currentScene = sceneKey;
+        const s = scenes[sceneKey];
+
+        el.titlePrefix.textContent = s.titlePrefix ?? "";
+        el.titleSuffix.textContent = s.titleSuffix ?? "";
+
+        if (s.titleInlineImg && s.titleInlineImg.trim() !== "") {
+          el.titleInlineImg.src = s.titleInlineImg;
+          el.titleInlineImg.style.display = "inline-block";
+        } else {
+          el.titleInlineImg.removeAttribute("src");
+          el.titleInlineImg.style.display = "none";
+        }
+
+        el.desc.textContent = s.desc ?? "";
+        el.hint.textContent = s.hint ?? "";
+
+        // Imagen: si img está vacío, no mostramos nada
+        if (s.img && s.img.trim() !== "") {
+          el.img.src = s.img;
+          el.img.style.display = "block";
+        } else {
+          el.img.removeAttribute("src");
+          el.img.style.display = "none";
+        }
+
+        // Botones: si hay textos, los mostramos; si no, los ocultamos
+        if (s.yesText) {
+          el.yesBtn.textContent = s.yesText;
+          el.yesBtn.style.display = "inline-block";
+        } else el.yesBtn.style.display = "none";
+
+        if (s.noText) {
+          el.noBtn.textContent = s.noText;
+          el.noBtn.style.display = "inline-block";
+        } else el.noBtn.style.display = "none";
+      }
+
+      /*
+      ==========================================================
+      ===================== 5) MODAL HELPERS ====================
+      ==========================================================
+    */
+      function showModal(opts) {
+        el.modalTitle.textContent = opts.title ?? "";
+        el.modalText.textContent = opts.text ?? "";
+
+        el.modalPrimary.textContent = opts.primaryText ?? "Ok";
+        el.modalSecondary.textContent = opts.secondaryText ?? "Cerrar";
+
+        // Limpia handlers previos
+        el.modalPrimary.onclick = null;
+        el.modalSecondary.onclick = null;
+
+        el.modalPrimary.onclick = () => {
+          hideModal();
+          opts.onPrimary?.();
+        };
+        el.modalSecondary.onclick = () => {
+          hideModal();
+          opts.onSecondary?.();
+        };
+
+        el.overlay.style.display = "flex";
+      }
+
+      function hideModal() {
+        el.overlay.style.display = "none";
+      }
+
+      // Cerrar modal si clickea afuera
+      el.overlay.addEventListener("click", (e) => {
+        if (e.target === el.overlay) hideModal();
+      });
+
+      /*
+      ==========================================================
+      =================== 6) EFECTOS (OPCIONAL) =================
+      ==========================================================
+    */
+      function growYes() {
+        // ✅ crecimiento suave/elegante controlado por constantes
+        const capped = Math.min(noCount, YES_GROW_MAX);
+        const scale = 1 + capped * YES_GROW_STEP;
+        el.yesBtn.style.transform = `scale(${scale})`;
+      }
+
+      function rectsOverlap(a, b, padding = 10) {
+        return !(
+          a.right + padding < b.left ||
+          a.left - padding > b.right ||
+          a.bottom + padding < b.top ||
+          a.top - padding > b.bottom
+        );
+      }
+
+      function nudgeNo() {
+        const outside = 40; // cuánto puede salirse del card
+        const tries = 30;
+        const padding = 12;
+
+        const cardRect = el.card.getBoundingClientRect();
+        const yesRect = el.yesBtn.getBoundingClientRect();
+        const noRect0 = el.noBtn.getBoundingClientRect();
+
+        // Permitimos moverse por el card + un margen "outside"
+        const minLeft = -outside;
+        const maxLeft = cardRect.width - noRect0.width + outside;
+        const minTop = -outside;
+        const maxTop = cardRect.height - noRect0.height + outside;
+
+        for (let i = 0; i < tries; i++) {
+          const left = minLeft + Math.random() * (maxLeft - minLeft);
+          const top = minTop + Math.random() * (maxTop - minTop);
+
+          // left/top relativo a .card (porque #noBtn está dentro del card)
+          el.noBtn.style.left = `${left}px`;
+          el.noBtn.style.top = `${top}px`;
+          el.noBtn.style.right = "auto"; // IMPORTANTE: si estabas usando right/top
+          el.noBtn.style.bottom = "auto";
+          el.noBtn.style.transform = "none";
+
+          const noRect = el.noBtn.getBoundingClientRect();
+          if (!rectsOverlap(noRect, yesRect, padding)) return;
+        }
+      }
+
+      /*
+      Confetti mini (solo para celebrar)
+      - Si no lo quieres: en accept() comenta launchConfetti();
+    */
+      const ctx = el.confetti.getContext("2d");
+      function resizeCanvas() {
+        el.confetti.width = innerWidth;
+        el.confetti.height = innerHeight;
+      }
+      addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      function launchConfetti() {
+        const pieces = Array.from({ length: 180 }, () => ({
+          x: Math.random() * el.confetti.width,
+          y: -20 - Math.random() * el.confetti.height * 0.3,
+          s: 2 + Math.random() * 4,
+          vx: -2 + Math.random() * 4,
+          vy: 2 + Math.random() * 5,
+          a: Math.random() * Math.PI * 2,
+          va: -0.2 + Math.random() * 0.4,
+        }));
+
+        let frames = 0;
+        (function anim() {
+          frames++;
+          ctx.clearRect(0, 0, el.confetti.width, el.confetti.height);
+
+          for (const p of pieces) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.a += p.va;
+            p.vy += 0.03;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.a);
+            ctx.fillRect(-p.s, -p.s, p.s * 2, p.s * 2);
+            ctx.restore();
+          }
+
+          if (frames < 220) requestAnimationFrame(anim);
+          else ctx.clearRect(0, 0, el.confetti.width, el.confetti.height);
+        })();
+      }
+
+      /*
+      ==========================================================
+      ================== 7) LÓGICA PRINCIPAL ====================
+      ==========================================================
+    */
+      function accept() {
+        el.audio.currentTime = 0;
+        el.audio.play().catch(() => {});
+
+        launchConfetti();
+        setScene("accepted");
+
+        el.btns.style.display = "none";
+        el.hint.textContent = "Ventajas: Cenar. / Desventajas: Conmigo.";
+        el.audio.loop = true;
+      }
+
+      let noEscapeMode = false;
+
+      function enableNoEscapeMode() {
+        if (noEscapeMode) return;
+        noEscapeMode = true;
+
+        // El contenedor de referencia
+        el.btns.style.position = "relative";
+
+        // Pasamos el botón No a absoluto a partir de ahora
+        el.noBtn.style.position = "absolute";
+
+        // Lo colocamos EXACTAMENTE donde está en ese momento (para que no “salte”)
+        const btnsRect = el.btns.getBoundingClientRect();
+        const noRect = el.noBtn.getBoundingClientRect();
+
+        el.noBtn.style.left = `${noRect.left - btnsRect.left}px`;
+        el.noBtn.style.top = `${noRect.top - btnsRect.top}px`;
+        el.noBtn.style.right = "auto";
+        el.noBtn.style.bottom = "auto";
+        el.noBtn.style.transform = "none";
+      }
+
+      function handleNo() {
+        enableNoEscapeMode();
+        if (noHasGivenUp) {
+          accept();
+          return;
+        }
+        noCount++;
+
+        // Efectos opcionales
+        growYes();
+        nudgeNo();
+
+        // Selecciona el prompt según noCount
+        const idx = Math.min(noCount - 1, noPrompts.length - 1);
+        const p = noPrompts[idx];
+        const yesLabel =
+          modalYesTexts[Math.min(noCount - 1, modalYesTexts.length - 1)];
+
+        showModal({
+          title: p.title,
+          text: p.text,
+
+          primaryText: yesLabel,
+          secondaryText: "No. 😑",
+
+          onPrimary: () => accept(),
+          onSecondary: () => {
+            // “Rendición” opcional: después de N intentos el No cambia
+            if (NO_GIVES_UP_AFTER > 0 && noCount >= NO_GIVES_UP_AFTER) {
+              noHasGivenUp = true;
+              el.noBtn.textContent = "Sí (pero en negritas)";
+              el.noBtn.classList.add("boldYes"); // opcional si quieres negritas reales
+            }
+          },
+        });
+
+        // BONUS: si quieres cambiar imagen al presionar No
+        // setTemporaryImageForNo(noCount);
+      }
+
+      /*
+      ==========================================================
+      =========== 8) EJEMPLO: CAMBIAR IMAGEN POR “NO” ===========
+      ==========================================================
+    */
+      const noImages = [
+        // "imgs/no1.jpg",
+        // "imgs/no2.jpg",
+        // "imgs/no3.jpg",
+      ];
+
+      const modalYesTexts = [
+        "Ok… sí 💖",
+        "Bueno… sí preciosote",
+        "Sííííííííí",
+        "Shi <3",
+        "OBVIO que sí",
+      ];
+
+      function setTemporaryImageForNo(count) {
+        if (noImages.length === 0) return;
+        const imgPath = noImages[Math.min(count - 1, noImages.length - 1)];
+        if (!imgPath) return;
+
+        el.img.src = imgPath;
+        el.img.style.display = "block";
+      }
+
+      /*
+      ==========================================================
+      =================== 9) EVENTOS (NO TOCAR) =================
+      ==========================================================
+    */
+      el.yesBtn.addEventListener("click", accept);
+      el.noBtn.addEventListener("click", handleNo);
+
+      // Inicializa
+      setScene("start");
+      el.noBtn.style.left = "";
+      el.noBtn.style.top = "";
+    </script>
+  </body>
+</html>
