@@ -197,6 +197,7 @@
         top: auto;
         right: auto;
         bottom: auto; /* reseteo */
+        z-index: 2
       }
 
       #noBtn.boldYes {
@@ -471,6 +472,7 @@
       // Cerrar modal si clickea afuera
       el.overlay.addEventListener("click", (e) => {
         if (e.target === el.overlay) hideModal();
+        el.noBtn.style.display = "inline-block";
       });
 
       /*
@@ -494,36 +496,62 @@
         );
       }
 
-      function nudgeNo() {
-        const outside = 40; // cuánto puede salirse del card
-        const tries = 30;
-        const padding = 12;
+      function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
 
-        const cardRect = el.card.getBoundingClientRect();
-        const yesRect = el.yesBtn.getBoundingClientRect();
-        const noRect0 = el.noBtn.getBoundingClientRect();
+function nudgeNo(){
+  const tries = 25;
+  const outside = 30;  // cuánto puede salirse del card (px)
+  const padding = 10;
 
-        // Permitimos moverse por el card + un margen "outside"
-        const minLeft = -outside;
-        const maxLeft = cardRect.width - noRect0.width + outside;
-        const minTop = -outside;
-        const maxTop = cardRect.height - noRect0.height + outside;
+  const cardRect = el.card.getBoundingClientRect();
+  const noRect0  = el.noBtn.getBoundingClientRect();
+  const yesRect  = el.yesBtn.getBoundingClientRect();
 
-        for (let i = 0; i < tries; i++) {
-          const left = minLeft + Math.random() * (maxLeft - minLeft);
-          const top = minTop + Math.random() * (maxTop - minTop);
+  // límites en viewport para NO salirte de la pantalla
+  const screenMinLeft = 8;
+  const screenMaxLeft = window.innerWidth - noRect0.width - 8;
+  const screenMinTop  = 8;
+  const screenMaxTop  = window.innerHeight - noRect0.height - 8;
 
-          // left/top relativo a .card (porque #noBtn está dentro del card)
-          el.noBtn.style.left = `${left}px`;
-          el.noBtn.style.top = `${top}px`;
-          el.noBtn.style.right = "auto"; // IMPORTANTE: si estabas usando right/top
-          el.noBtn.style.bottom = "auto";
-          el.noBtn.style.transform = "none";
+  function overlap(a, b, pad){
+    return !(
+      (a.right + pad) < b.left ||
+      (a.left - pad) > b.right ||
+      (a.bottom + pad) < b.top ||
+      (a.top - pad) > b.bottom
+    );
+  }
 
-          const noRect = el.noBtn.getBoundingClientRect();
-          if (!rectsOverlap(noRect, yesRect, padding)) return;
-        }
-      }
+  for(let i=0; i<tries; i++){
+    // candidato relativo al card (permite salirse un poco)
+    let left = (-outside) + Math.random() * ((cardRect.width - noRect0.width) + outside*2);
+    let top  = (-outside) + Math.random() * ((cardRect.height - noRect0.height) + outside*2);
+
+    // convierto a coords de viewport
+    let desiredLeft = cardRect.left + left;
+    let desiredTop  = cardRect.top  + top;
+
+    // CLAMP: que no se vaya fuera de la pantalla
+    desiredLeft = clamp(desiredLeft, screenMinLeft, screenMaxLeft);
+    desiredTop  = clamp(desiredTop, screenMinTop, screenMaxTop);
+
+    // vuelvo a coords relativas al card
+    left = desiredLeft - cardRect.left;
+    top  = desiredTop  - cardRect.top;
+
+    // aplica (si estás en modo absolute)
+    el.noBtn.style.position = "absolute";
+    el.noBtn.style.left = `${left}px`;
+    el.noBtn.style.top  = `${top}px`;
+    el.noBtn.style.right = "auto";
+    el.noBtn.style.bottom = "auto";
+    el.noBtn.style.transform = "none";
+
+    const noRect = el.noBtn.getBoundingClientRect();
+    if(!overlap(noRect, yesRect, padding)) return;
+  }
+}
+
 
       /*
       Confetti mini (solo para celebrar)
