@@ -197,7 +197,7 @@
         top: auto;
         right: auto;
         bottom: auto; /* reseteo */
-        z-index: 2
+        z-index: 9999;
       }
 
       #noBtn.boldYes {
@@ -321,7 +321,7 @@
           titleInlineImg: "imgs/valentin.jpg",
           titleSuffix: " ?",
           desc: "Di que sí, porfavorsito con azucar encima 🥺",
-          img: "imgs/cat.jpg", 
+          img: "imgs/cat.jpg",
           yesText: "Sí 💖",
           noText: "No 🙃",
           hint: "Solo hay una respuesta correcta.",
@@ -487,6 +487,10 @@
         el.yesBtn.style.transform = `scale(${scale})`;
       }
 
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
       function rectsOverlap(a, b, padding = 10) {
         return !(
           a.right + padding < b.left ||
@@ -496,62 +500,41 @@
         );
       }
 
-      function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+      function nudgeNo() {
+        const margin = 10; // margen a los bordes de pantalla
+        const tries = 35;
+        const padding = 12; // separación respecto al Sí
 
-function nudgeNo(){
-  const tries = 25;
-  const outside = 30;  // cuánto puede salirse del card (px)
-  const padding = 10;
+        // Medimos tamaños actuales
+        const noRect0 = el.noBtn.getBoundingClientRect();
+        const yesRect = el.yesBtn.getBoundingClientRect();
 
-  const cardRect = el.card.getBoundingClientRect();
-  const noRect0  = el.noBtn.getBoundingClientRect();
-  const yesRect  = el.yesBtn.getBoundingClientRect();
+        // Límites para que NO se salga del viewport
+        const minLeft = margin;
+        const maxLeft = window.innerWidth - noRect0.width - margin;
+        const minTop = margin;
+        const maxTop = window.innerHeight - noRect0.height - margin;
 
-  // límites en viewport para NO salirte de la pantalla
-  const screenMinLeft = 8;
-  const screenMaxLeft = window.innerWidth - noRect0.width - 8;
-  const screenMinTop  = 8;
-  const screenMaxTop  = window.innerHeight - noRect0.height - 8;
+        for (let i = 0; i < tries; i++) {
+          const left = minLeft + Math.random() * (maxLeft - minLeft);
+          const top = minTop + Math.random() * (maxTop - minTop);
 
-  function overlap(a, b, pad){
-    return !(
-      (a.right + pad) < b.left ||
-      (a.left - pad) > b.right ||
-      (a.bottom + pad) < b.top ||
-      (a.top - pad) > b.bottom
-    );
-  }
+          el.noBtn.style.left = `${left}px`;
+          el.noBtn.style.top = `${top}px`;
 
-  for(let i=0; i<tries; i++){
-    // candidato relativo al card (permite salirse un poco)
-    let left = (-outside) + Math.random() * ((cardRect.width - noRect0.width) + outside*2);
-    let top  = (-outside) + Math.random() * ((cardRect.height - noRect0.height) + outside*2);
+          const noRect = el.noBtn.getBoundingClientRect();
+          if (!rectsOverlap(noRect, yesRect, padding)) return;
+        }
 
-    // convierto a coords de viewport
-    let desiredLeft = cardRect.left + left;
-    let desiredTop  = cardRect.top  + top;
-
-    // CLAMP: que no se vaya fuera de la pantalla
-    desiredLeft = clamp(desiredLeft, screenMinLeft, screenMaxLeft);
-    desiredTop  = clamp(desiredTop, screenMinTop, screenMaxTop);
-
-    // vuelvo a coords relativas al card
-    left = desiredLeft - cardRect.left;
-    top  = desiredTop  - cardRect.top;
-
-    // aplica (si estás en modo absolute)
-    el.noBtn.style.position = "absolute";
-    el.noBtn.style.left = `${left}px`;
-    el.noBtn.style.top  = `${top}px`;
-    el.noBtn.style.right = "auto";
-    el.noBtn.style.bottom = "auto";
-    el.noBtn.style.transform = "none";
-
-    const noRect = el.noBtn.getBoundingClientRect();
-    if(!overlap(noRect, yesRect, padding)) return;
-  }
-}
-
+        // fallback: si no encontró (porque Sí creció mucho), lo manda abajo del Sí
+        const fallbackLeft = Math.max(minLeft, Math.min(maxLeft, yesRect.left));
+        const fallbackTop = Math.max(
+          minTop,
+          Math.min(maxTop, yesRect.bottom + padding),
+        );
+        el.noBtn.style.left = `${fallbackLeft}px`;
+        el.noBtn.style.top = `${fallbackTop}px`;
+      }
 
       /*
       Confetti mini (solo para celebrar)
@@ -621,18 +604,11 @@ function nudgeNo(){
         if (noEscapeMode) return;
         noEscapeMode = true;
 
-        // El contenedor de referencia
-        el.btns.style.position = "relative";
+        const r = el.noBtn.getBoundingClientRect();
 
-        // Pasamos el botón No a absoluto a partir de ahora
-        el.noBtn.style.position = "absolute";
-
-        // Lo colocamos EXACTAMENTE donde está en ese momento (para que no “salte”)
-        const btnsRect = el.btns.getBoundingClientRect();
-        const noRect = el.noBtn.getBoundingClientRect();
-
-        el.noBtn.style.left = `${noRect.left - btnsRect.left}px`;
-        el.noBtn.style.top = `${noRect.top - btnsRect.top}px`;
+        el.noBtn.style.position = "fixed";
+        el.noBtn.style.left = `${r.left}px`;
+        el.noBtn.style.top = `${r.top}px`;
         el.noBtn.style.right = "auto";
         el.noBtn.style.bottom = "auto";
         el.noBtn.style.transform = "none";
